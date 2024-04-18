@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "window-mirror"
+version = "0.1.0"
+description = "Mirror a single window on another screen (macOS only, python)"
+authors = ["Christoph Sommer <sommer@cms-labs.org>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "<3.13,>=3.8"
+pyobjc = "^10.1"
+pyside6 = "^6.6.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.autopep8]
+max-line-length = 999
