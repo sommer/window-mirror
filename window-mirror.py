@@ -156,7 +156,8 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
 
         self.setWindowTitle('Mirrored Window')
         self.setMinimumSize(320, 240)
-        self.setCursor(PySide6.QtGui.QCursor(PySide6.QtCore.Qt.CursorShape.CrossCursor))
+        # self.setCursor(PySide6.QtGui.QCursor(PySide6.QtCore.Qt.CursorShape.CrossCursor))
+        self.setCursor(PySide6.QtGui.QCursor(PySide6.QtCore.Qt.CursorShape.ForbiddenCursor))
 
         # preferred size
         self.resize(640, 480)
