@@ -102,7 +102,7 @@ if not args.app_name:
     parser.print_help()
     exit(1)
 
-preview_title = 'Mirrored Window (press q to close)'
+preview_title = 'Mirrored Window'
 
 app_name = args.app_name
 
@@ -154,7 +154,7 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
         self.inverted = False
         self.high_contrast = False
 
-        self.setWindowTitle('Mirrored Window (press q to close)')
+        self.setWindowTitle('Mirrored Window')
         self.setMinimumSize(320, 240)
         self.setCursor(PySide6.QtGui.QCursor(PySide6.QtCore.Qt.CursorShape.CrossCursor))
 
@@ -171,9 +171,9 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
         self.timer.start(1000//max_fps)
 
     def keyPressEvent(self, event):
-        if event.key() == PySide6.QtCore.Qt.Key.Key_Q:
+        if False and event.key() == PySide6.QtCore.Qt.Key.Key_Q:
             self.close()
-        elif event.key() == PySide6.QtCore.Qt.Key.Key_Escape:
+        elif False and event.key() == PySide6.QtCore.Qt.Key.Key_Escape:
             self.close()
         elif event.key() == PySide6.QtCore.Qt.Key.Key_I:
             self.inverted = not self.inverted
