@@ -185,6 +185,16 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
 
     def update_image(self):
 
+        # detect if the mouse is over the source window
+        is_mouse_over = False
+        pos = PySide6.QtGui.QCursor.pos()
+        window_bounds = Quartz.CGWindowListCreateDescriptionFromArray((window_id,))
+        window_bounds = window_bounds[0]
+        window_bounds = window_bounds['kCGWindowBounds']
+        window_bounds = PySide6.QtCore.QRect(window_bounds['X'], window_bounds['Y'], window_bounds['Width'], window_bounds['Height'])
+        is_mouse_over = window_bounds.contains(pos)
+        relative_pos = (pos.x() - window_bounds.topLeft().x()) / window_bounds.size().width(), (pos.y() - window_bounds.topLeft().y()) / window_bounds.size().height()
+
         # capture the window
         image = Quartz.CGWindowListCreateImage(Quartz.CGRectNull, Quartz.kCGWindowListOptionIncludingWindow, window_id, Quartz.kCGWindowImageBoundsIgnoreFraming)
         # img_width = CGImageGetWidth(image)
@@ -212,6 +222,22 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
             pixels = np.where(pixels > stretch_above, np.minimum((pixels-float(stretch_center))*float(alpha)+stretch_center, 255).astype(np.uint8), pixels)
             pixels = np.where(pixels < stretch_below, np.maximum((pixels-float(stretch_center))*float(alpha)+stretch_center, 0).astype(np.uint8), pixels)
             image = PySide6.QtGui.QImage(pixels.data, image.width(), image.height(), PySide6.QtGui.QImage.Format_Grayscale8)
+
+        # paint an arrow where the mouse is
+        if is_mouse_over:
+            arrow_color = PySide6.QtGui.QColor('red')
+            arrow_opacity = 0.5
+            arrow_length = image.width() / 40
+            arrow_width = image.width() / 80
+            painter = PySide6.QtGui.QPainter(image)
+            painter.setRenderHint(PySide6.QtGui.QPainter.RenderHint.Antialiasing)
+            painter.setBrush(PySide6.QtGui.QBrush(arrow_color))
+            painter.setPen(PySide6.QtGui.QPen(PySide6.QtGui.QColor('transparent')))
+            painter.setOpacity(arrow_opacity)
+            painter.translate(relative_pos[0] * image.width(), relative_pos[1] * image.height())
+            painter.rotate(45)
+            painter.drawPolygon(PySide6.QtGui.QPolygonF([PySide6.QtCore.QPointF(0, 0), PySide6.QtCore.QPointF(arrow_length, -.5*arrow_width), PySide6.QtCore.QPointF(arrow_length, .5*arrow_width), PySide6.QtCore.QPointF(0, 0)]))
+            painter.end()
 
         # center the image
         image = image.copy(image.width()//2 - self.label.width()//2, image.height()//2 - self.label.height()//2, self.label.width(), self.label.height())
