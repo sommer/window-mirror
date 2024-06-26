@@ -192,9 +192,7 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
         img_data = Quartz.CoreGraphics.CGDataProviderCopyData(img_data_provider)
         # bytes_per_row = Quartz.CGImageGetBytesPerRow(image)
         img_width = int(len(img_data) / img_height / 4)
-        str_data = img_data.bytes().tobytes()
-
-        image = PySide6.QtGui.QImage(str_data, img_width, img_height, PySide6.QtGui.QImage.Format_ARGB32)
+        image = PySide6.QtGui.QImage(img_data, img_width, img_height, PySide6.QtGui.QImage.Format_ARGB32)
 
         # scale the image to fit the window
         image = image.scaled(self.label.size(), PySide6.QtCore.Qt.AspectRatioMode.KeepAspectRatio, PySide6.QtCore.Qt.TransformationMode.SmoothTransformation)
