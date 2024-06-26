@@ -31,6 +31,7 @@ import argparse
 import signal
 from collections import namedtuple
 
+import numpy as np
 import PySide6.QtWidgets
 import Quartz
 import Quartz.CoreGraphics
@@ -149,6 +150,10 @@ class MyApplication(PySide6.QtWidgets.QApplication):
 class MyWindow(PySide6.QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.inverted = False
+        self.high_contrast = False
+
         self.setWindowTitle('Mirrored Window (press q to close)')
         self.setMinimumSize(320, 240)
         self.setCursor(PySide6.QtGui.QCursor(PySide6.QtCore.Qt.CursorShape.CrossCursor))
@@ -170,6 +175,12 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
             self.close()
         elif event.key() == PySide6.QtCore.Qt.Key.Key_Escape:
             self.close()
+        elif event.key() == PySide6.QtCore.Qt.Key.Key_I:
+            self.inverted = not self.inverted
+            self.update_image()
+        elif event.key() == PySide6.QtCore.Qt.Key.Key_C:
+            self.high_contrast = not self.high_contrast
+            self.update_image()
 
     def update_image(self):
 
@@ -187,6 +198,21 @@ class MyWindow(PySide6.QtWidgets.QMainWindow):
 
         # scale the image to fit the window
         image = image.scaled(self.label.size(), PySide6.QtCore.Qt.AspectRatioMode.KeepAspectRatio, PySide6.QtCore.Qt.TransformationMode.SmoothTransformation)
+
+        if self.inverted:
+            image.invertPixels()
+
+        if self.high_contrast:
+            image = image.convertToFormat(PySide6.QtGui.QImage.Format_Grayscale8)
+            pixels = image.bits()  # returns a memoryview
+            alpha = 2
+            stretch_above = 128
+            stretch_below = 128
+            stretch_center = 192
+            pixels = np.frombuffer(image.bits(), dtype=np.uint8)
+            pixels = np.where(pixels > stretch_above, np.minimum((pixels-float(stretch_center))*float(alpha)+stretch_center, 255).astype(np.uint8), pixels)
+            pixels = np.where(pixels < stretch_below, np.maximum((pixels-float(stretch_center))*float(alpha)+stretch_center, 0).astype(np.uint8), pixels)
+            image = PySide6.QtGui.QImage(pixels.data, image.width(), image.height(), PySide6.QtGui.QImage.Format_Grayscale8)
 
         # center the image
         image = image.copy(image.width()//2 - self.label.width()//2, image.height()//2 - self.label.height()//2, self.label.width(), self.label.height())
